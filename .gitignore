@@ -1,3 +1,4 @@
-.codio/
-.guides/
-.settings/
+.codio
+.guides
+.settings
+.DS_Store
