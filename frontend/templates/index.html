@@ -16,8 +16,26 @@
         </div>
         <div class="input-field">
             <input type="text" id="post-title" placeholder="Enter Post Title">
+            <input type="text" id="post-author" placeholder="Enter Author Name">
             <input type="text" id="post-content" placeholder="Enter Post Content">
-            <button onclick="addPost()">Add Post</button>
+            <div class="action-buttons">
+                <button id="add-update-btn" onclick="addPost()">Add Post</button>
+                <button id="cancel-btn" style="display:none;" onclick="cancelUpdate()">Cancel</button>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search-query" placeholder="Search posts..." onkeyup="searchPosts()">
+            </div>
+            <div class="sort-box">
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by" onchange="loadPosts()">
+                    <option value="id-desc">Newest First</option>
+                    <option value="id-asc">Oldest First</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                </select>
+            </div>
         </div>
         <div id="post-container">
             <!-- Blog posts will be inserted here by JavaScript -->

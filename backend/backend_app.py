@@ -1,12 +1,35 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS  # type: ignore[import-untyped]
+from flask_swagger_ui import get_swaggerui_blueprint, flask_swagger_ui  # type: ignore[import-untyped]
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
+SWAGGER_URL="/api/docs"  # (1) swagger endpoint e.g. HTTP://localhost:5002/api/docs
+API_URL="/static/masterblog.json" # (2) ensure you create this dir and file
+
+swagger_ui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': 'Masterblog API' # (3) You can change this if you like
+    }
+)
+app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
+
+
+
 POSTS = [
-    {"id": 1, "title": "First post", "content": "This is the first post."},
-    {"id": 2, "title": "Second post", "content": "This is the second post."},
+    {"id": 1, "title": "First post", "content": "This is the first post.", "author": "Alice", "date": "2026-04-01"},
+    {"id": 2, "title": "Second post", "content": "This is the second post.", "author": "Bob", "date": "2026-04-02"},
+    {"id": 3, "title": "Third post", "content": "This is the third post.", "author": "Charlie", "date": "2026-04-01"},
+    {"id": 4, "title": "Fourth post", "content": "This is the fourth post.", "author": "Alice", "date": "2026-03-31"},
+    {"id": 5, "title": "Fifth post", "content": "This is the fifth post.", "author": "Bob", "date": "2026-04-02"},
+    {"id": 6, "title": "Sixth post", "content": "This is the sixth post.", "author": "Charlie", "date": "2026-04-01"},
+    {"id": 7, "title": "Seventh post", "content": "This is the seventh post.", "author": "Alice", "date": "2026-03-31"},
+    {"id": 8, "title": "Eighth post", "content": "This is the eighth post.", "author": "Bob", "date": "2026-04-02"},
+    {"id": 9, "title": "Ninth post", "content": "This is the ninth post.", "author": "Charlie", "date": "2026-04-01"},
+    {"id": 10, "title": "Tenth post", "content": "This is the tenth post.", "author": "Alice", "date": "2026-03-31"}
 ]
 
 def generate_next_id():
@@ -35,6 +58,7 @@ def add_post():
     """
     Adds a new post to the list.
     """
+    from datetime import datetime
     data = request.get_json()
 
     if data is None:
@@ -42,6 +66,8 @@ def add_post():
 
     title = data.get('title')
     content = data.get('content')
+    author = data.get('author', 'Anonymous')
+    date = data.get('date', datetime.now().strftime("%Y-%m-%d"))
 
     if not title or not content:
         return jsonify({"error": "Both 'title' and 'content' are required!"}), 400
@@ -49,7 +75,9 @@ def add_post():
     new_post = {
         "id": generate_next_id(),
         "title": title,
-        "content": content
+        "content": content,
+        "author": author,
+        "date": date
     }
 
     POSTS.append(new_post)
@@ -60,7 +88,7 @@ def delete_post(post_id):
     for post in POSTS:
         if post["id"] == post_id:
             POSTS.remove(post)
-            return jsonify({"message": "Post deleted"}), 200
+            return jsonify({"message": f"Post with id {post_id} has been deleted successfully."}), 200
     return jsonify({"error": "Post not found"}), 404
 
 @app.route('/api/posts/<int:post_id>', methods=['PUT'])
@@ -74,6 +102,8 @@ def update_post(post_id):
         if post["id"] == post_id:
             post["title"] = data["title"]
             post["content"] = data["content"]
+            post["author"] = data.get("author", post.get("author", "Anonymous"))
+            post["date"] = data.get("date", post.get("date", ""))
             return jsonify(post), 200
 
     return jsonify({"error": "Post not found"}), 404
