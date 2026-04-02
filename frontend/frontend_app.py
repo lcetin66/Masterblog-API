@@ -1,3 +1,7 @@
+"""
+Masterblog Frontend Application
+This module serves the frontend UI for the Masterblog API.
+"""
 from flask import Flask, render_template
 
 app = Flask(__name__)
@@ -5,6 +9,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def home():
+    """Renders the main blog page."""
     return render_template("index.html")
 
 
